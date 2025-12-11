@@ -1,0 +1,641 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Memorama del Sistema Inmunológico</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .setup-screen, .game-screen, .finished-screen {
+            display: none;
+        }
+
+        .setup-screen.active, .game-screen.active, .finished-screen.active {
+            display: block;
+        }
+
+        /* Setup Screen Styles */
+        .setup-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 600px;
+            margin: 0 auto;
+            animation: fadeIn 0.5s;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .icon-container {
+            display: inline-block;
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            padding: 20px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+        }
+
+        .icon {
+            font-size: 48px;
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 16px;
+        }
+
+        .section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+        }
+
+        .player-btn {
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            background: #e5e7eb;
+            color: #374151;
+            transition: all 0.3s;
+        }
+
+        .player-btn:hover {
+            background: #d1d5db;
+        }
+
+        .player-btn.active {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .player-inputs {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .player-input-row {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .player-number {
+            color: #6b7280;
+            font-weight: 600;
+            min-width: 30px;
+        }
+
+        .player-input {
+            flex: 1;
+            padding: 12px 15px;
+            border: 2px solid #d1d5db;
+            border-radius: 10px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+
+        .player-input:focus {
+            outline: none;
+            border-color: #a855f7;
+        }
+
+        .start-btn {
+            width: 100%;
+            padding: 15px;
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .start-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        /* Game Screen Styles */
+        .game-header {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            padding: 20px;
+            margin-bottom: 30px;
+        }
+
+        .game-header-content {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .game-title {
+            font-size: 24px;
+            color: #1f2937;
+        }
+
+        .scores {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .player-score {
+            padding: 10px 20px;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.3s;
+            background: #e5e7eb;
+            color: #374151;
+        }
+
+        .player-score.active {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 4px 15px rgba(59, 130, 246, 0.3);
+        }
+
+        .reset-btn {
+            padding: 10px 20px;
+            background: #ef4444;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            transition: background 0.3s;
+        }
+
+        .reset-btn:hover {
+            background: #dc2626;
+        }
+
+        .current-turn {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #a855f7;
+            padding: 10px;
+            background: #f3e8ff;
+            border-radius: 10px;
+            animation: pulse 1s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.02); }
+        }
+
+        .game-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+            animation: fadeIn 0.5s;
+        }
+
+        @media (min-width: 768px) {
+            .game-board {
+                grid-template-columns: repeat(6, 1fr);
+            }
+        }
+
+        .card {
+            aspect-ratio: 1;
+            border: none;
+            border-radius: 15px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            background: linear-gradient(135deg, #d1d5db, #9ca3af);
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 10px;
+            line-height: 1.2;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card:hover:not(.flipped):not(:disabled) {
+            background: linear-gradient(135deg, #9ca3af, #6b7280);
+            transform: scale(1.05);
+        }
+
+        .card.flipped {
+            transform: scale(1.05);
+            box-shadow: 0 6px 20px rgba(0,0,0,0.2);
+        }
+
+        .card:disabled {
+            cursor: not-allowed;
+        }
+
+        .card-back {
+            font-size: 48px;
+        }
+
+        .card-image {
+            font-size: 40px;
+            margin-bottom: 5px;
+        }
+
+        .card-text {
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        /* Modal de información */
+        .info-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s;
+        }
+
+        .info-modal.active {
+            display: flex;
+        }
+
+        .info-modal-content {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            animation: slideUp 0.3s;
+        }
+
+        .info-icon {
+            font-size: 80px;
+            margin-bottom: 15px;
+        }
+
+        .info-title {
+            font-size: 28px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 10px;
+        }
+
+        .info-description {
+            font-size: 18px;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        .info-detail {
+            background: #f9fafb;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.6;
+        }
+
+        /* Finished Screen Styles */
+        .finished-box {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+            padding: 40px;
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+            animation: fadeIn 0.5s;
+        }
+
+        .trophy-icon {
+            display: inline-block;
+            background: linear-gradient(135deg, #fbbf24, #f97316);
+            padding: 20px;
+            border-radius: 50%;
+            margin-bottom: 20px;
+            font-size: 64px;
+        }
+
+        .winner-announcement {
+            font-size: 24px;
+            font-weight: 600;
+            color: #a855f7;
+            margin: 20px 0 10px;
+        }
+
+        .winner-score {
+            color: #6b7280;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .scoreboard {
+            background: #f9fafb;
+            border-radius: 15px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .scoreboard-title {
+            font-size: 20px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+
+        .score-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: white;
+            padding: 15px 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+            margin-bottom: 15px;
+        }
+
+        .score-item-left {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .medal {
+            font-size: 32px;
+        }
+
+        .player-name {
+            font-weight: 600;
+            color: #1f2937;
+        }
+
+        .score-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #a855f7;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            flex: 1;
+            min-width: 200px;
+            padding: 15px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+
+        .play-again-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+        }
+
+        .play-again-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
+        }
+
+        .new-config-btn {
+            background: linear-gradient(135deg, #3b82f6, #a855f7);
+            color: white;
+        }
+
+        .new-config-btn:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.3);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px) scale(0.9);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Color classes for cards */
+        .color-1 { background: linear-gradient(135deg, #3b82f6, #2563eb) !important; }
+        .color-2 { background: linear-gradient(135deg, #10b981, #059669) !important; }
+        .color-3 { background: linear-gradient(135deg, #eab308, #ca8a04) !important; }
+        .color-4 { background: linear-gradient(135deg, #ef4444, #dc2626) !important; }
+        .color-5 { background: linear-gradient(135deg, #a855f7, #9333ea) !important; }
+        .color-6 { background: linear-gradient(135deg, #ec4899, #db2777) !important; }
+        .color-7 { background: linear-gradient(135deg, #6366f1, #4f46e5) !important; }
+        .color-8 { background: linear-gradient(135deg, #f97316, #ea580c) !important; }
+        .color-9 { background: linear-gradient(135deg, #14b8a6, #0d9488) !important; }
+        .color-10 { background: linear-gradient(135deg, #06b6d4, #0891b2) !important; }
+        .color-11 { background: linear-gradient(135deg, #84cc16, #65a30d) !important; }
+        .color-12 { background: linear-gradient(135deg, #f43f5e, #e11d48) !important; }
+
+        @media (max-width: 600px) {
+            h1 {
+                font-size: 24px;
+            }
+            .setup-box, .finished-box {
+                padding: 20px;
+            }
+            .game-board {
+                gap: 10px;
+            }
+            .card {
+                font-size: 11px;
+            }
+            .card-image {
+                font-size: 30px;
+            }
+            .card-text {
+                font-size: 9px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Setup Screen -->
+        <div class="setup-screen active" id="setupScreen">
+            <div class="setup-box">
+                <div class="header">
+                    <div class="icon-container">
+                        <div class="icon">🦠</div>
+                    </div>
+                    <h1>Memorama del Sistema Inmunológico</h1>
+                    <p class="subtitle">Aprende jugando sobre las defensas de tu cuerpo</p>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">
+                        <span>👥</span>
+                        <span>Número de jugadores</span>
+                    </div>
+                    <div class="player-buttons">
+                        <button class="player-btn" data-players="1">1</button>
+                        <button class="player-btn active" data-players="2">2</button>
+                        <button class="player-btn" data-players="3">3</button>
+                        <button class="player-btn" data-players="4">4</button>
+                    </div>
+                </div>
+
+                <div class="section">
+                    <div class="section-title">Nombres de los jugadores</div>
+                    <div class="player-inputs" id="playerInputs">
+                        <!-- Player inputs will be generated here -->
+                    </div>
+                </div>
+
+                <button class="start-btn" id="startBtn">
+                    <span>▶️</span>
+                    <span>Comenzar Juego</span>
+                </button>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div class="game-screen" id="gameScreen">
+            <div class="game-header">
+                <div class="game-header-content">
+                    <h2 class="game-title">🦠 Memorama Inmunológico</h2>
+                    <div class="scores" id="scoresContainer"></div>
+                    <button class="reset-btn" id="resetBtn">
+                        <span>↻</span>
+                        <span>Reiniciar</span>
+                    </button>
+                </div>
+                <div class="current-turn" id="currentTurn"></div>
+            </div>
+            <div class="game-board" id="gameBoard"></div>
+        </div>
+
+        <!-- Finished Screen -->
+        <div class="finished-screen" id="finishedScreen">
+            <div class="finished-box">
+                <div class="trophy-icon">🏆</div>
+                <h1>¡Juego Terminado!</h1>
+                <div id="winnerAnnouncement"></div>
+
+                <div class="scoreboard">
+                    <h3 class="scoreboard-title">Puntuación Final</h3>
+                    <div id="finalScores"></div>
+                </div>
+
+                <div class="action-buttons">
+                    <button class="action-btn play-again-btn" id="playAgainBtn">
+                        <span>▶️</span>
+                        <span>Jugar de Nuevo</span>
+                    </button>
+                    <button class="action-btn new-config-btn" id="newConfigBtn">
+                        <span>↻</span>
+                        <span>Nueva Configuración</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de información -->
+    <div class="info-modal" id="infoModal">
+        <div class="info-modal-content">
+            <div class="info-icon" id="modalIcon"></div>
+            <div class="info-title" id="modalTitle"></div>
+            <div class="info-description" id="modalDescription"></div>
+            <div class="info-detail" id="modalDetail"></div>
+        </div>
+    </div>
+
+    <script src="game.js"></script>
+</body>
+</html>
