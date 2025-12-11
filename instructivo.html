@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instructivo - Memorama Inmunológico</title>
+    <style>
+        :root {
+            --primary: #3b82f6;
+            --secondary: #a855f7;
+            --text: #1f2937;
+            --bg-gradient: linear-gradient(135deg, #e0f2fe 0%, #f3e8ff 50%, #fce7f3 100%);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: var(--bg-gradient);
+            color: var(--text);
+            line-height: 1.6;
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 50px;
+            border-radius: 20px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.1);
+        }
+
+        /* Cabecera */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+            border-bottom: 2px solid #e5e7eb;
+            padding-bottom: 30px;
+        }
+
+        .icon {
+            font-size: 60px;
+            display: block;
+            margin-bottom: 15px;
+            animation: bounce 2s infinite;
+        }
+
+        h1 {
+            color: #1f2937;
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #6b7280;
+            font-size: 18px;
+        }
+
+        /* Enlace del sitio y QR */
+        .site-link { text-align: center; margin-top: 10px; }
+        .site-link a { color: #374151; text-decoration: none; font-weight: 700; }
+
+        .qr-container { text-align: center; margin-top: 14px; }
+        .qr-image { width: 160px; height: 160px; border-radius: 12px; border: 1px solid #e5e7eb; }
+        .qr-caption { margin-top: 8px; color: #4b5563; font-size: 14px; }
+
+        /* Secciones */
+        .section {
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            color: var(--secondary);
+            font-size: 24px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .rules-list {
+            list-style: none;
+            counter-reset: rule-counter;
+        }
+
+        .rules-list li {
+            position: relative;
+            padding-left: 50px;
+            margin-bottom: 20px;
+        }
+
+        .rules-list li::before {
+            counter-increment: rule-counter;
+            content: counter(rule-counter);
+            position: absolute;
+            left: 0;
+            top: -2px;
+            width: 35px;
+            height: 35px;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 35px;
+            font-weight: bold;
+            font-size: 18px;
+        }
+
+        .highlight-box {
+            background: #f3e8ff;
+            border-left: 5px solid var(--secondary);
+            padding: 20px;
+            margin: 20px 0;
+            border-radius: 0 10px 10px 0;
+        }
+
+        /* Guía de estudio (Grid de tarjetas) */
+        .study-guide {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .guide-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 10px;
+            padding: 15px;
+            page-break-inside: avoid; /* Evita que se corten al imprimir */
+        }
+
+        .guide-card-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-weight: bold;
+            color: var(--primary);
+        }
+
+        .guide-card-icon {
+            font-size: 24px;
+        }
+
+        .guide-desc {
+            font-size: 14px;
+            color: #4b5563;
+        }
+
+        /* Botón de imprimir (solo pantalla) */
+        .print-btn-container {
+            text-align: center;
+            margin-top: 40px;
+        }
+
+        .print-btn {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 18px;
+            border-radius: 10px;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: transform 0.2s;
+        }
+
+        .print-btn:hover {
+            transform: scale(1.05);
+        }
+
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        /* =========================================
+           ESTILOS PARA IMPRESIÓN
+           ========================================= */
+        @media print {
+            body {
+                background: white;
+                color: black;
+                padding: 0;
+                font-size: 12pt;
+            }
+
+            .container {
+                box-shadow: none;
+                padding: 0;
+                max-width: 100%;
+                margin: 0;
+            }
+
+            .print-btn-container {
+                display: none; /* Ocultar botón al imprimir */
+            }
+
+            header {
+                margin-bottom: 20px;
+                padding-bottom: 10px;
+                border-bottom: 1px solid #000;
+            }
+
+            .icon {
+                animation: none; /* Sin animaciones en papel */
+            }
+
+            h1 { font-size: 24pt; margin: 0; }
+            h2 { font-size: 16pt; color: black; border-bottom: 1px solid #ccc; padding-bottom: 5px; }
+
+            .rules-list li::before {
+                background: white;
+                color: black;
+                border: 2px solid black;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .highlight-box {
+                background: white;
+                border: 1px solid #000;
+                border-left: 5px solid #000;
+            }
+
+            .study-guide {
+                display: block; /* Mejor flujo para columnas */
+                column-count: 2;
+                column-gap: 20px;
+            }
+
+            .guide-card {
+                border: 1px solid #000;
+                margin-bottom: 15px;
+                break-inside: avoid;
+            }
+
+            /* Links al pie de página */
+            a { text-decoration: none; color: black; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <span class="icon">🦠🛡️</span>
+            <h1>Memorama del Sistema Inmunológico</h1>
+            <p class="subtitle">Guía de juego y referencia de estudio</p>
+            <p class="site-link"><a href="https://tungtungtungsahur.lat" target="_blank" rel="noopener">http://tungtungtungsahur.lat</a></p>
+        </header>
+
+        <section class="section">
+            <h2>📜 Objetivo del Juego</h2>
+            <p>
+                El objetivo es encontrar la mayor cantidad de <strong>parejas de cartas idénticas</strong>. 
+                Cada pareja representa un componente clave del sistema inmunológico o un patógeno. 
+                Al encontrar una pareja, aprenderás qué función cumple ese elemento en la defensa de tu cuerpo.
+            </p>
+        </section>
+
+        <section class="section">
+            <h2>🎲 Cómo Jugar</h2>
+            <ol class="rules-list">
+                <li>
+                    <strong>Configuración:</strong> Selecciona el número de jugadores (de 1 a 4) y escribe sus nombres en la pantalla de inicio.
+                </li>
+                <li>
+                    <strong>El Turno:</strong> El jugador activo debe seleccionar <strong>dos cartas</strong> del tablero tocándolas o haciendo clic sobre ellas.
+                </li>
+                <li>
+                    <strong>Si son iguales:</strong> 
+                    <ul>
+                        <li>¡Punto para ti! Se mostrará una ventana con información educativa sobre la carta.</li>
+                        <li>Tendrás unos segundos para leer la información.</li>
+                        <li>Las cartas se quedan descubiertas y <strong>conservas tu turno</strong> para intentar encontrar otra pareja.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Si son diferentes:</strong>
+                    <ul>
+                        <li>Las cartas se volverán a ocultar automáticamente.</li>
+                        <li>Tu turno termina y le toca al siguiente jugador.</li>
+                    </ul>
+                </li>
+                <li>
+                    <strong>Ganador:</strong> El juego termina cuando todas las parejas han sido encontradas. Gana el jugador que haya acumulado más parejas.
+                </li>
+            </ol>
+            
+            <div class="highlight-box">
+                <strong>💡 Tip Estratégico:</strong> ¡Presta mucha atención cuando no es tu turno! Memorizar la posición de las cartas que voltean otros jugadores es la clave para ganar.
+            </div>
+        </section>
+
+        <section class="section">
+            <h2>📚 Guía de Estudio (Las Cartas)</h2>
+            <p style="margin-bottom: 20px;">A continuación, se listan todos los elementos que encontrarás en el juego y su función:</p>
+            
+            <div class="study-guide">
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🔵</span> Linfocito T
+                    </div>
+                    <div class="guide-desc">Identifican y destruyen células infectadas por virus o células cancerosas. Esenciales en la respuesta inmune celular.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🟢</span> Linfocito B
+                    </div>
+                    <div class="guide-desc">Producen anticuerpos, proteínas que marcan patógenos para su destrucción. Clave en la inmunidad humoral.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🟡</span> Macrófago
+                    </div>
+                    <div class="guide-desc">Actúan como "limpiadores", engullendo y digiriendo patógenos y desechos mediante fagocitosis.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🔴</span> Neutrófilo
+                    </div>
+                    <div class="guide-desc">Los primeros en llegar a la infección. Son los glóbulos blancos más abundantes y destruyen bacterias.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🟣</span> Célula NK
+                    </div>
+                    <div class="guide-desc">"Natural Killer". Destruyen células infectadas y tumorales sin necesidad de activación previa.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">💗</span> Timo
+                    </div>
+                    <div class="guide-desc">Órgano donde maduran los Linfocitos T y aprenden a distinguir células propias de extrañas.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🦴</span> Médula ósea
+                    </div>
+                    <div class="guide-desc">Tejido dentro de los huesos donde se producen todas las células sanguíneas (glóbulos rojos, blancos y plaquetas).</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🧡</span> Bazo
+                    </div>
+                    <div class="guide-desc">Filtra la sangre, elimina células viejas y produce anticuerpos. Crucial contra infecciones sanguíneas.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🏹</span> Anticuerpo
+                    </div>
+                    <div class="guide-desc">Proteínas en forma de Y que se unen a antígenos específicos para marcarlos y destruirlos.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">🦠</span> Bacteria
+                    </div>
+                    <div class="guide-desc">Microorganismos unicelulares. Algunas causan infecciones que requieren respuesta inmune.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">👾</span> Virus
+                    </div>
+                    <div class="guide-desc">Agentes infecciosos que invaden células para reproducirse. El sistema inmune destruye las células infectadas.</div>
+                </div>
+
+                <div class="guide-card">
+                    <div class="guide-card-header">
+                        <span class="guide-card-icon">💉</span> Vacuna
+                    </div>
+                    <div class="guide-desc">Entrena al sistema inmune con formas debilitadas de patógenos para prevenir enfermedades futuras.</div>
+                </div>
+            </div>
+        </section>
+
+        <div class="print-btn-container">
+            <button class="print-btn" onclick="window.print()">
+                <span>🖨️</span> Imprimir Instructivo
+            </button>
+        </div>
+    </div>
+
+</body>
+</html>

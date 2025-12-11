@@ -167,6 +167,79 @@
             box-shadow: 0 6px 20px rgba(16, 185, 129, 0.3);
         }
 
+        /* Botón para ver instructivo */
+        .instruct-btn {
+            width: 100%;
+            padding: 12px;
+            margin-bottom: 12px;
+            background: linear-gradient(135deg, #3b82f6, #6366f1);
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        /* Modal para embeber el instructivo */
+        .instruct-modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1200;
+            padding: 20px;
+        }
+
+        .instruct-modal.active {
+            display: flex;
+        }
+
+        .instruct-modal-content {
+            background: white;
+            width: 100%;
+            max-width: 1000px;
+            height: 80vh;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .instruct-iframe {
+            border: 0;
+            width: 100%;
+            height: 100%;
+        }
+
+        .instruct-close {
+            position: absolute;
+            right: 12px;
+            top: 12px;
+            background: rgba(0,0,0,0.6);
+            color: white;
+            border: none;
+            width: 38px;
+            height: 38px;
+            border-radius: 8px;
+            font-size: 18px;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        .site-link { text-align: center; margin-top: 8px; }
+        .site-link a { color: #374151; text-decoration: none; font-weight: 700; }
+
         /* Game Screen Styles */
         .game-header {
             background: white;
@@ -555,6 +628,7 @@
                     </div>
                     <h1>Memorama del Sistema Inmunológico</h1>
                     <p class="subtitle">Aprende jugando sobre las defensas de tu cuerpo</p>
+                    <p class="site-link"><a href="https://tungtungtungsahur.lat" target="_blank" rel="noopener">tungtungtungsahur.lat</a></p>
                 </div>
 
                 <div class="section">
@@ -577,10 +651,15 @@
                     </div>
                 </div>
 
-                <button class="start-btn" id="startBtn">
-                    <span>▶️</span>
-                    <span>Comenzar Juego</span>
-                </button>
+                    <button class="start-btn instruct-btn" id="viewInstructBtn">
+                        <span>📖</span>
+                        <span>Ver Instructivo</span>
+                    </button>
+
+                    <button class="start-btn" id="startBtn">
+                        <span>▶️</span>
+                        <span>Comenzar Juego</span>
+                    </button>
             </div>
         </div>
 
@@ -636,6 +715,45 @@
         </div>
     </div>
 
+    <!-- Instructivo Embed Modal -->
+    <div class="instruct-modal" id="instructModal" aria-hidden="true">
+        <div class="instruct-modal-content">
+            <button class="instruct-close" id="instructCloseBtn" aria-label="Cerrar">✖</button>
+            <iframe class="instruct-iframe" id="instructFrame" src="instructivo.html" title="Instructivo" frameborder="0"></iframe>
+        </div>
+    </div>
+
     <script src="game.js"></script>
+    <script>
+        (function(){
+            const viewBtn = document.getElementById('viewInstructBtn');
+            const modal = document.getElementById('instructModal');
+            const closeBtn = document.getElementById('instructCloseBtn');
+
+            if(viewBtn && modal) {
+                viewBtn.addEventListener('click', () => {
+                    modal.classList.add('active');
+                    modal.setAttribute('aria-hidden','false');
+                });
+            }
+
+            if(closeBtn && modal) {
+                closeBtn.addEventListener('click', () => {
+                    modal.classList.remove('active');
+                    modal.setAttribute('aria-hidden','true');
+                });
+            }
+
+            // Cerrar al hacer click fuera del contenido
+            if(modal) {
+                modal.addEventListener('click', (e) => {
+                    if(e.target === modal) {
+                        modal.classList.remove('active');
+                        modal.setAttribute('aria-hidden','true');
+                    }
+                });
+            }
+        })();
+    </script>
 </body>
 </html>
